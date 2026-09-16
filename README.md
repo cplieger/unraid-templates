@@ -1,7 +1,7 @@
 # unraid-templates
 
 [![License](https://img.shields.io/github/license/cplieger/unraid-templates)](LICENSE)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/PROJECT_ID/badge)](https://www.bestpractices.dev/projects/PROJECT_ID)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/14673/badge)](https://www.bestpractices.dev/projects/14673)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cplieger/unraid-templates/badge)](https://scorecard.dev/viewer/?uri=github.com/cplieger/unraid-templates)
 
 Unraid Community Applications templates for the container images published by cplieger.
