@@ -35,9 +35,7 @@ def text(el, tag):
 
 
 def parse(path):
-    # The inputs are this repository's own files, so the stdlib parser's
-    # entity handling is not a concern here.
-    return ET.parse(path).getroot()  # noqa: S314
+    return ET.parse(path).getroot()
 
 
 def check_template(path, names, findings):
