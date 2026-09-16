@@ -1,0 +1,53 @@
+# Template publish: check every template and the repository profile, then cut
+# a semver release from conventional-commit subjects since the last tag. This
+# repo has no go.mod, jsr.json or Dockerfile, so the central release pipeline
+# never runs for it; the release is owned here, the way tool-catalog's is.
+# Community Apps reads main directly, so the release carries no assets and
+# exists as the changelog of the template set.
+name: Publish
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - renovate.json
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check templates and profile
+        run: python3 scripts/validate.py
+
+  release:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # gh release create (tag + notes)
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the version step reads tags and the commit log
+          persist-credentials: false
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/release.sh

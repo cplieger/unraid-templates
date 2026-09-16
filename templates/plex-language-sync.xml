@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>plex-language-sync</Name>
+  <Repository>cplieger/plex-language-sync:latest</Repository>
+  <Registry>https://hub.docker.com/r/cplieger/plex-language-sync/</Registry>
+  <Network>bridge</Network>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/cplieger/plex-language-sync/issues</Support>
+  <Project>https://github.com/cplieger/plex-language-sync</Project>
+  <ReadMe>https://raw.githubusercontent.com/cplieger/plex-language-sync/main/README.md</ReadMe>
+  <Overview>Set preferred audio and subtitle languages per show; every new episode follows automatically.
+
+Watches Plex playback in real time. When you pick an audio or subtitle track on one episode, the same choice is applied to the rest of the show, for that Plex user. It also learns your audio-to-subtitle habits and applies them to brand new shows before you press play. Multi-user aware, no web UI, no open port: a single small container that talks to your Plex server.</Overview>
+  <Category>MediaApp:Video Tools:Utilities</Category>
+  <Icon>https://raw.githubusercontent.com/cplieger/unraid-templates/main/icons/plex-language-sync.png</Icon>
+  <TemplateURL>https://raw.githubusercontent.com/cplieger/unraid-templates/main/templates/plex-language-sync.xml</TemplateURL>
+  <License>GPL-3.0-or-later</License>
+  <ExtraSearchTerms>plex audio subtitle language track auto-languages</ExtraSearchTerms>
+  <Requires>Plex URL: the full URL of your Plex server including scheme and port, for example http://192.0.2.100:32400 (use the server's LAN IP, not a container name).
+Plex Token: the server administrator's token, from Plex Web: Settings, then the XML view of any item, then myPlexAccessToken.
+Multi-user support fetches shared user tokens from plex.tv, so the container needs internet access.
+Raise the Docker stop time-out to 20 seconds or more (Settings, Docker, advanced view) so the final cache save completes on stop.</Requires>
+  <ExtraParams>--user 99:100</ExtraParams>
+  <Config Name="Plex URL" Target="PLEX_URL" Default="" Mode="" Description="Full URL of your Plex Media Server including scheme and port, e.g. http://192.0.2.100:32400" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Plex Token" Target="PLEX_TOKEN" Default="" Mode="" Description="Plex authentication token of the server administrator (Plex Web: Settings, XML view, myPlexAccessToken)" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Config" Target="/config" Default="/mnt/user/appdata/plex-language-sync" Mode="rw" Description="Persistent cache: learned language profiles, shared-user tokens and sync state" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/plex-language-sync</Config>
+  <Config Name="Update level" Target="UPDATE_LEVEL" Default="show" Mode="" Description="Scope of language propagation: show applies to all episodes of the show, season only to the current season" Type="Variable" Display="advanced" Required="false" Mask="false">show</Config>
+  <Config Name="Update strategy" Target="UPDATE_STRATEGY" Default="all" Mode="" Description="Which episodes to update: all updates every episode in scope, next only the episodes after the one being played" Type="Variable" Display="advanced" Required="false" Mask="false">all</Config>
+  <Config Name="Trigger on play" Target="TRIGGER_ON_PLAY" Default="true" Mode="" Description="React to playback events: playing an episode propagates its language settings" Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Trigger on scan" Target="TRIGGER_ON_SCAN" Default="true" Mode="" Description="React to library scans: newly added or updated episodes get each user's recorded selection for the show" Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Learn language profiles" Target="LEARN_LANGUAGE_PROFILES" Default="true" Mode="" Description="Learn audio-to-subtitle language pairs from playback and apply them to brand new shows with no watch history" Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
+  <Config Name="Subtitle match tier" Target="SUBTITLE_MATCH_TIER" Default="same-language" Mode="" Description="How far a subtitle substitution may reach when no exact language match exists: identical, same-language, other-script, intelligible or shared-literacy" Type="Variable" Display="advanced" Required="false" Mask="false">same-language</Config>
+  <Config Name="Deep scan interval" Target="DEEP_SCAN_INTERVAL" Default="24h" Mode="" Description="Cadence of the deep-scan safety net as a Go duration (24h, 12h); off disables it" Type="Variable" Display="advanced" Required="false" Mask="false">24h</Config>
+  <Config Name="Ignore labels" Target="IGNORE_LABELS" Default="PAL_IGNORE,PLS_IGNORE" Mode="" Description="Comma-separated Plex labels that exclude a show from language sync (exact, case-sensitive; setting this replaces the defaults)" Type="Variable" Display="advanced" Required="false" Mask="false">PAL_IGNORE,PLS_IGNORE</Config>
+  <Config Name="Ignore libraries" Target="IGNORE_LIBRARIES" Default="" Mode="" Description="Comma-separated Plex library names to exclude entirely (exact, case-sensitive)" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="Log level" Target="LOG_LEVEL" Default="info" Mode="" Description="Minimum log level: debug, info, warn or error; debug shows per-event skip reasons and stream-matching detail" Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+  <Config Name="Plex CA certificate path" Target="PLEX_CA_CERT_PATH" Default="" Mode="" Description="Only for an https Plex URL with a self-signed or private-CA certificate: in-container path of the CA PEM file (add a matching path mapping)" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+</Container>

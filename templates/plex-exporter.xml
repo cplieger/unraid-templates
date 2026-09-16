@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>plex-exporter</Name>
+  <Repository>cplieger/plex-exporter:latest</Repository>
+  <Registry>https://hub.docker.com/r/cplieger/plex-exporter/</Registry>
+  <Network>bridge</Network>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/cplieger/plex-exporter/issues</Support>
+  <Project>https://github.com/cplieger/plex-exporter</Project>
+  <ReadMe>https://raw.githubusercontent.com/cplieger/plex-exporter/main/README.md</ReadMe>
+  <Overview>See what your Plex server is doing in Grafana: sessions, libraries, bandwidth, transcoding.
+
+Connects to your Plex Media Server and exposes metrics (active sessions, library sizes, bandwidth, transcoding status) on /metrics for Prometheus to scrape and Grafana to visualize. A ready-made Grafana dashboard ships in the project repository (grafana-dashboard.json). Read-only against Plex, no web UI of its own.</Overview>
+  <Category>Tools:Utilities MediaApp:Video</Category>
+  <WebUI>http://[IP]:[PORT:9594]/metrics</WebUI>
+  <Icon>https://raw.githubusercontent.com/cplieger/unraid-templates/main/icons/plex-exporter.png</Icon>
+  <TemplateURL>https://raw.githubusercontent.com/cplieger/unraid-templates/main/templates/plex-exporter.xml</TemplateURL>
+  <License>GPL-3.0-or-later</License>
+  <ExtraSearchTerms>plex prometheus grafana metrics exporter monitoring</ExtraSearchTerms>
+  <Requires>Needs a Prometheus-compatible scraper (Prometheus, Grafana Alloy, VictoriaMetrics) pointed at port 9594 and Grafana to show the dashboard; neither is included.
+Plex URL: the full URL of your Plex server including scheme and port, for example http://192.0.2.100:32400.
+Plex Token: the server administrator's token, from Plex Web: Settings, then the XML view of any item, then myPlexAccessToken.
+Host CPU, memory and bandwidth metrics require Plex Pass; everything else works without it.
+The metrics endpoint has no authentication: keep port 9594 on your LAN.</Requires>
+  <Config Name="Plex URL" Target="PLEX_URL" Default="" Mode="" Description="Full URL of your Plex Media Server including scheme and port, e.g. http://192.0.2.100:32400" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Plex Token" Target="PLEX_TOKEN" Default="" Mode="" Description="Plex authentication token of the server administrator (Plex Web: Settings, XML view, myPlexAccessToken)" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Metrics port" Target="9594" Default="9594" Mode="tcp" Description="Prometheus metrics (/metrics) and health (/api/health)" Type="Port" Display="always" Required="true" Mask="false">9594</Config>
+  <Config Name="Plex CA certificate path" Target="PLEX_CA_CERT_PATH" Default="" Mode="" Description="Only for an https Plex URL with a self-signed or private-CA certificate: in-container path of the CA PEM file (add a matching path mapping)" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+</Container>
