@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <CommunityApplications>
-  <Profile>Unraid templates for the container images published by cplieger: plex-language-sync (per-show audio and subtitle language sync for Plex), plex-exporter (Plex metrics for Prometheus and Grafana) and fclones-scheduler (scheduled duplicate-file cleanup). Every image is open source, built from a small Go binary on a distroless base and published for amd64 and arm64. Support for an app goes to that app's GitHub issues, linked from each template; a problem with a template itself goes to this repository's issues.</Profile>
+  <Profile>Unraid templates for the container images published by cplieger: plex-language-sync (per-show audio and subtitle language sync for Plex), plex-exporter (Plex metrics for Prometheus and Grafana), fclones-scheduler (scheduled duplicate-file cleanup) and seadex-scout (flags anime releases SeaDex rates better than the copy on disk). Every image is open source, built from a small Go binary on a distroless base and published for amd64 and arm64. Support for an app goes to that app's GitHub issues, linked from each template; a problem with a template itself goes to this repository's issues.</Profile>
   <Icon>https://raw.githubusercontent.com/cplieger/unraid-templates/main/icon.png</Icon>
   <WebPage>https://github.com/cplieger/unraid-templates</WebPage>
 </CommunityApplications>

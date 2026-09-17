@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>seadex-scout</Name>
+  <Repository>cplieger/seadex-scout:latest</Repository>
+  <Registry>https://hub.docker.com/r/cplieger/seadex-scout/</Registry>
+  <Network>bridge</Network>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/cplieger/seadex-scout/issues</Support>
+  <Project>https://github.com/cplieger/seadex-scout</Project>
+  <ReadMe>https://raw.githubusercontent.com/cplieger/seadex-scout/main/README.md</ReadMe>
+  <Overview>Report-only watcher flagging better SeaDex releases for a Sonarr/Radarr anime library.
+
+Compares your Sonarr/Radarr anime library against SeaDex (the community-curated index of the best anime releases) and tells you, per title, when SeaDex recommends a better release than the one on disk. It never downloads or touches a torrent client: it writes a report and a warning log line, and you decide. Optionally serves the SeaDex picks as a Torznab feed for Sonarr, Radarr or Prowlarr.</Overview>
+  <Category>MediaApp:Video Tools:Utilities</Category>
+  <Icon>https://raw.githubusercontent.com/cplieger/unraid-templates/main/icons/seadex-scout.png</Icon>
+  <TemplateURL>https://raw.githubusercontent.com/cplieger/unraid-templates/main/templates/seadex-scout.xml</TemplateURL>
+  <License>GPL-3.0-or-later</License>
+  <ExtraSearchTerms>seadex anime sonarr radarr releases.moe torznab</ExtraSearchTerms>
+  <Requires>Sonarr URL and Sonarr API key are enough to start. Fill them in and the first start writes /config/config.yaml, reads your values from these fields and begins comparing; leave Radarr empty if you only run Sonarr.
+
+A finding is a warning line in the container log, never a download. Read the log from the Docker tab.
+
+For a full season-by-season report, run this from an Unraid terminal (Tools, then Terminal) while the container is up: docker exec seadex-scout /seadex-scout report
+It writes a timestamped Markdown and JSON pair into /config/reports. The container is distroless, so the Console button in the Docker tab does not work.
+
+Everything else is tuned in /config/config.yaml, which is annotated. The container reads it once at start, so restart it after an edit.
+
+The Torznab port is only bound when a Torznab URL is set in config.yaml; leave the port mapping alone otherwise. Keep that feed on your LAN: its AnimeBytes links carry your passkey.</Requires>
+  <ExtraParams>--user 99:100</ExtraParams>
+  <Config Name="Sonarr URL" Target="SONARR_URL" Default="" Mode="" Description="Where seadex-scout reaches Sonarr, including scheme and port, e.g. http://192.0.2.100:8989 (use the server's LAN IP, not a container name)" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Sonarr API key" Target="SONARR_API_KEY" Default="" Mode="" Description="Sonarr's API key, from Sonarr: Settings, General, API Key" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Config" Target="/config" Default="/mnt/user/appdata/seadex-scout" Mode="rw" Description="config.yaml, state and the reports folder" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/seadex-scout</Config>
+  <Config Name="Radarr URL" Target="RADARR_URL" Default="" Mode="" Description="Where seadex-scout reaches Radarr, e.g. http://192.0.2.100:7878; leave empty to watch Sonarr only" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="Radarr API key" Target="RADARR_API_KEY" Default="" Mode="" Description="Radarr's API key, from Radarr: Settings, General, API Key; required when Radarr URL is set" Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="Torznab port" Target="9118" Default="9118" Mode="tcp" Description="Torznab feed for Sonarr, Radarr or Prowlarr; only listens when a Torznab URL is configured in config.yaml" Type="Port" Display="advanced" Required="false" Mask="false">9118</Config>
+</Container>
