@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Render the repository icon and one icon per template.
+"""Render the repository icon, one icon per template, and the copied brand marks.
 
-One design for the whole set. Every glyph sits in the same 40x32 box on the
+One design for the generated set. Every glyph sits in the same 40x32 box on the
 same square off-white tile, is drawn with one stroke width and one corner
 radius, uses solid dots of one size for its marks, and takes its colour from one
 perceptual lightness and chroma with the hue set by the app's ecosystem. Unraid draws the
@@ -9,6 +9,11 @@ PNG as-is at 32x32 with no rounding and no theme adaptation, so the tile is
 what keeps the glyph readable on every theme. The SVG sources land in
 icons/src/ and the PNGs beside the templates; run with
 `uv run --with cairosvg scripts/icons.py`.
+
+Apps that already ship their own mark keep it: icons/brand/*.svg holds those
+copied verbatim from the app's own favicon, and this script only rasterises
+them, so they are the one part of icons/ that is edited as art rather than
+generated from the constants below.
 """
 
 import math
@@ -146,10 +151,13 @@ def svg(ecosystem, shapes):
     )
 
 
+def rasterise(source):
+    return cairosvg.svg2png(bytestring=source.encode(), output_width=SIZE, output_height=SIZE)
+
+
 def render(ecosystem, shapes):
     source = svg(ecosystem, shapes)
-    png = cairosvg.svg2png(bytestring=source.encode(), output_width=SIZE, output_height=SIZE)
-    return source, png
+    return source, rasterise(source)
 
 
 def main():
@@ -162,7 +170,14 @@ def main():
     source, png = render(*REPO_GLYPH)
     (src / 'icon.svg').write_text(source + '\n')
     (ROOT / 'icon.png').write_bytes(png)
-    print(f'wrote {len(GLYPHS)} app icons and icon.png')
+    brands = sorted((ROOT / 'icons' / 'brand').glob('*.svg'))
+    for path in brands:
+        source = path.read_text()
+        if 'rx=' in source:
+            msg = f'{path.name} carries a corner radius; Unraid needs the tile square'
+            raise ValueError(msg)
+        (ROOT / 'icons' / f'{path.stem}.png').write_bytes(rasterise(source))
+    print(f'wrote {len(GLYPHS)} app icons, {len(brands)} brand icons and icon.png')
 
 
 if __name__ == '__main__':
