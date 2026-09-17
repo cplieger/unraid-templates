@@ -1,8 +1,6 @@
 # unraid-templates
 
 [![License](https://img.shields.io/github/license/cplieger/unraid-templates)](LICENSE)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/14673/badge)](https://www.bestpractices.dev/projects/14673)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cplieger/unraid-templates/badge)](https://scorecard.dev/viewer/?uri=github.com/cplieger/unraid-templates)
 
 Unraid Community Applications templates for the container images published by cplieger.
 
@@ -15,6 +13,7 @@ One XML template per app under `templates/`, in the format Unraid's Docker manag
 | plex-language-sync | Set preferred audio and subtitle languages per show; every new episode follows automatically | [`templates/plex-language-sync.xml`](templates/plex-language-sync.xml) | [cplieger/plex-language-sync](https://github.com/cplieger/plex-language-sync) |
 | plex-exporter | Plex sessions, libraries, bandwidth and transcoding as Prometheus metrics, with a Grafana dashboard | [`templates/plex-exporter.xml`](templates/plex-exporter.xml) | [cplieger/plex-exporter](https://github.com/cplieger/plex-exporter) |
 | fclones-scheduler | Find and deduplicate files on a schedule with fclones | [`templates/fclones-scheduler.xml`](templates/fclones-scheduler.xml) | [cplieger/docker-fclones-scheduler](https://github.com/cplieger/docker-fclones-scheduler) |
+| seadex-scout | Flag anime releases in a Sonarr/Radarr library that SeaDex rates better than the copy on disk | [`templates/seadex-scout.xml`](templates/seadex-scout.xml) | [cplieger/seadex-scout](https://github.com/cplieger/seadex-scout) |
 
 ## Install on Unraid
 
