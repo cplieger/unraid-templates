@@ -2,21 +2,26 @@
 """Render the repository icon, one icon per template, and the copied brand marks.
 
 One design for the generated set. Every glyph sits in the same 40x32 box on the
-same square off-white tile, is drawn with one stroke width and one corner
-radius, uses solid dots of one size for its marks, and takes its colour from one
-perceptual lightness and chroma with the hue set by the app's ecosystem. Unraid draws the
-PNG as-is at 32x32 with no rounding and no theme adaptation, so the tile is
-what keeps the glyph readable on every theme. The SVG sources land in
-icons/src/ and the PNGs beside the templates; run with
-`uv run --with cairosvg scripts/icons.py`.
+same square tile, is drawn with one stroke width and one corner radius, uses
+solid dots of one size for its marks, and takes its colour from one perceptual
+lightness and chroma with the hue set by the app's ecosystem. Unraid draws the
+PNG as-is at 32x32 with no rounding and no theme adaptation, so the filled tile
+is what makes one file work on every theme. The canonical set is the accent tile
+with an off-white glyph, square: SVG sources in icons/src/ and PNGs beside the
+templates, which is what every <Icon> points at.
+
+The other shape and polarity combinations render to icons/variants/<name>/ so a
+future surface can be served without re-deriving them; nothing references them
+and Unraid never downloads them. Run with `uv run --with cairosvg scripts/icons.py`.
 
 Apps that already ship their own mark keep it: icons/brand/*.svg holds those
-copied verbatim from the app's own favicon, and this script only rasterises
-them, so they are the one part of icons/ that is edited as art rather than
-generated from the constants below.
+copied verbatim from the app's own favicon, and this script only rasterises and
+reshapes them, so they are the one part of icons/ that is edited as art rather
+than generated from the constants below.
 """
 
 import math
+import re
 from pathlib import Path
 
 import cairosvg
@@ -27,6 +32,7 @@ VIEW = 64
 TILE = '#f7f5f4'
 STROKE = 4.5
 CORNER = 4
+TILE_CORNER = 12
 DOT = 2.8
 # One perceptual lightness and chroma (OKLCH) for the whole family, the
 # highest chroma every hue below reaches inside sRGB at this lightness; only the
@@ -38,6 +44,17 @@ ECOSYSTEM = {
     'arr': 255,  # Sonarr's blue
     'storage': 150,  # green for the tools that work on the filesystem
 }
+# What Unraid gets, and the alternates kept for a surface that masks differently.
+CANONICAL = ('square', 'inverted')
+ALTERNATES = (
+    ('square', 'classic'),
+    ('rounded', 'classic'),
+    ('rounded', 'inverted'),
+    ('circle', 'classic'),
+    ('circle', 'inverted'),
+    ('square', 'transparent'),
+)
+BRAND_ALTERNATES = ('rounded', 'circle')
 
 
 def hue(degrees):
@@ -135,19 +152,62 @@ GLYPHS = {
 REPO_GLYPH = ('subflux', [('fill', rect(x, y, 14, 14)) for x in (16, 34) for y in (16, 34)])
 
 
-def svg(ecosystem, shapes):
+def tile(shape, fill):
+    """The background as one SVG element, or nothing when there is no tile."""
+    if fill is None:
+        return ''
+    if shape == 'circle':
+        half = VIEW / 2
+        return f'<circle cx="{half:g}" cy="{half:g}" r="{half:g}" fill="{fill}"/>'
+    radius = f' rx="{TILE_CORNER}"' if shape == 'rounded' else ''
+    return f'<rect width="{VIEW}" height="{VIEW}"{radius} fill="{fill}"/>'
+
+
+def svg(ecosystem, shapes, shape='square', ink='inverted'):
     accent = hue(ECOSYSTEM[ecosystem])
+    background, glyph = {
+        'classic': (TILE, accent),
+        'inverted': (accent, TILE),
+        'transparent': (None, accent),
+    }[ink]
     style = {
         'line': (
-            f'fill="none" stroke="{accent}" stroke-width="{STROKE}" '
+            f'fill="none" stroke="{glyph}" stroke-width="{STROKE}" '
             'stroke-linecap="round" stroke-linejoin="round"'
         ),
-        'fill': f'fill="{accent}"',
+        'fill': f'fill="{glyph}"',
     }
     body = ''.join(f'<path {style[kind]} d="{d}"/>' for kind, d in shapes)
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {VIEW} {VIEW}">'
-        f'<rect width="{VIEW}" height="{VIEW}" fill="{TILE}"/>{body}</svg>'
+        f'{tile(shape, background)}{body}</svg>'
+    )
+
+
+BRAND = re.compile(
+    r'(<svg\b[^>]*viewBox="0 0 ([\d.]+) ([\d.]+)"[^>]*>)(.*)(</svg>)\s*\Z', re.DOTALL
+)
+
+
+def reshape_brand(source, shape):
+    """Clip a copied brand mark to the tile shape; its own art is never redrawn."""
+    if shape == 'square':
+        return source
+    match = BRAND.match(source.strip())
+    if match is None:
+        msg = 'brand mark has no square viewBox to clip against'
+        raise ValueError(msg)
+    head, width, height, body, tail = match.groups()
+    width, height = float(width), float(height)
+    if shape == 'circle':
+        half = min(width, height) / 2
+        clip = f'<circle cx="{width / 2:g}" cy="{height / 2:g}" r="{half:g}"/>'
+    else:
+        radius = min(width, height) * TILE_CORNER / VIEW
+        clip = f'<rect width="{width:g}" height="{height:g}" rx="{radius:g}"/>'
+    return (
+        f'{head}<defs><clipPath id="tile">{clip}</clipPath></defs>'
+        f'<g clip-path="url(#tile)">{body}</g>{tail}'
     )
 
 
@@ -155,29 +215,44 @@ def rasterise(source):
     return cairosvg.svg2png(bytestring=source.encode(), output_width=SIZE, output_height=SIZE)
 
 
-def render(ecosystem, shapes):
-    source = svg(ecosystem, shapes)
-    return source, rasterise(source)
+def subjects():
+    """Every generated icon as (destination stem, ecosystem, shapes)."""
+    yield 'icon', *REPO_GLYPH
+    for name, (ecosystem, shapes) in GLYPHS.items():
+        yield name, ecosystem, shapes
+
+
+def write(directory, stem, source):
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / f'{stem}.svg').write_text(source + '\n')
+    (directory / f'{stem}.png').write_bytes(rasterise(source))
 
 
 def main():
-    src = ROOT / 'icons' / 'src'
-    src.mkdir(parents=True, exist_ok=True)
-    for name, (ecosystem, shapes) in GLYPHS.items():
-        source, png = render(ecosystem, shapes)
-        (src / f'{name}.svg').write_text(source + '\n')
-        (ROOT / 'icons' / f'{name}.png').write_bytes(png)
-    source, png = render(*REPO_GLYPH)
-    (src / 'icon.svg').write_text(source + '\n')
-    (ROOT / 'icon.png').write_bytes(png)
-    brands = sorted((ROOT / 'icons' / 'brand').glob('*.svg'))
+    icons = ROOT / 'icons'
+    shape, ink = CANONICAL
+    for stem, ecosystem, shapes in subjects():
+        source = svg(ecosystem, shapes, shape, ink)
+        (icons / 'src' / f'{stem}.svg').parent.mkdir(parents=True, exist_ok=True)
+        (icons / 'src' / f'{stem}.svg').write_text(source + '\n')
+        target = ROOT / 'icon.png' if stem == 'icon' else icons / f'{stem}.png'
+        target.write_bytes(rasterise(source))
+    for shape, ink in ALTERNATES:
+        directory = icons / 'variants' / (ink if ink == 'transparent' else f'{shape}-{ink}')
+        for stem, ecosystem, shapes in subjects():
+            write(directory, stem, svg(ecosystem, shapes, shape, ink))
+    brands = sorted((icons / 'brand').glob('*.svg'))
     for path in brands:
         source = path.read_text()
         if 'rx=' in source:
-            msg = f'{path.name} carries a corner radius; Unraid needs the tile square'
+            msg = f'{path.name} carries a corner radius; the canonical tile is square'
             raise ValueError(msg)
-        (ROOT / 'icons' / f'{path.stem}.png').write_bytes(rasterise(source))
-    print(f'wrote {len(GLYPHS)} app icons, {len(brands)} brand icons and icon.png')
+        (icons / f'{path.stem}.png').write_bytes(rasterise(source))
+        for shape in BRAND_ALTERNATES:
+            write(icons / 'variants' / f'{shape}-brand', path.stem, reshape_brand(source, shape))
+    generated = sum(1 for _ in subjects())
+    variants = generated * len(ALTERNATES) + len(brands) * len(BRAND_ALTERNATES)
+    print(f'wrote {generated} canonical icons, {len(brands)} brand icons and {variants} variants')
 
 
 if __name__ == '__main__':
