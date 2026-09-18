@@ -94,7 +94,7 @@ def check_template(path, names, findings):
             )
 
 
-def check_profile(findings):
+def check_profile(names, findings):
     path = ROOT / 'ca_profile.xml'
     if not path.is_file():
         findings.append('ca_profile.xml missing at the repository root')
@@ -106,8 +106,15 @@ def check_profile(findings):
         return
     if root.tag != 'CommunityApplications':
         findings.append('ca_profile.xml: root must be <CommunityApplications>')
-    if not text(root, 'Profile'):
+    profile = text(root, 'Profile')
+    if not profile:
         findings.append('ca_profile.xml: <Profile> is empty')
+    # The profile names each app, and nothing else ties that prose to the
+    # template set: it went stale on the first template added after it was
+    # written, and Community Apps shows it as the repository's description.
+    for name in sorted(set(names) - {'?'}):
+        if profile and name not in profile:
+            findings.append(f'ca_profile.xml: <Profile> does not mention {name}')
     icon = text(root, 'Icon')
     if not icon.startswith(RAW) or not (ROOT / icon[len(RAW) :]).is_file():
         findings.append(f'ca_profile.xml: <Icon> must name a file in this repository, got {icon!r}')
@@ -121,7 +128,7 @@ def main():
         findings.append('templates/ holds no XML file')
     for path in templates:
         check_template(path, names, findings)
-    check_profile(findings)
+    check_profile(names, findings)
     stray = [
         p
         for p in ROOT.rglob('*.xml')
