@@ -17,12 +17,12 @@ Watches Plex playback in real time. When you pick an audio or subtitle track on 
   <License>GPL-3.0-or-later</License>
   <ExtraSearchTerms>plex audio subtitle language track auto-languages</ExtraSearchTerms>
   <Requires>Plex URL: the full URL of your Plex server including scheme and port, for example http://192.0.2.100:32400 (use the server's LAN IP, not a container name).
-Plex Token: the server administrator's token, from Plex Web: Settings, then the XML view of any item, then myPlexAccessToken.
+Plex Token: the server administrator's token. Plex's guide Finding an authentication token shows where to find it: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 Multi-user support fetches shared user tokens from plex.tv, so the container needs internet access.
 Raise the Docker stop time-out to 20 seconds or more (Settings, Docker, advanced view) so the final cache save completes on stop.</Requires>
   <ExtraParams>--user 99:100</ExtraParams>
   <Config Name="Plex URL" Target="PLEX_URL" Default="" Mode="" Description="Full URL of your Plex Media Server including scheme and port, e.g. http://192.0.2.100:32400" Type="Variable" Display="always" Required="true" Mask="false"></Config>
-  <Config Name="Plex Token" Target="PLEX_TOKEN" Default="" Mode="" Description="Plex authentication token of the server administrator (Plex Web: Settings, XML view, myPlexAccessToken)" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Plex Token" Target="PLEX_TOKEN" Default="" Mode="" Description="Plex authentication token of the server administrator. Plex's guide: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/" Type="Variable" Display="always" Required="true" Mask="true"></Config>
   <Config Name="Config" Target="/config" Default="/mnt/user/appdata/plex-language-sync" Mode="rw" Description="Persistent cache: learned language profiles, shared-user tokens and sync state" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/plex-language-sync</Config>
   <Config Name="Update level" Target="UPDATE_LEVEL" Default="show" Mode="" Description="Scope of language propagation: show applies to all episodes of the show, season only to the current season" Type="Variable" Display="advanced" Required="false" Mask="false">show</Config>
   <Config Name="Update strategy" Target="UPDATE_STRATEGY" Default="all" Mode="" Description="Which episodes to update: all updates every episode in scope, next only the episodes after the one being played" Type="Variable" Display="advanced" Required="false" Mask="false">all</Config>
