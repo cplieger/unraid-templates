@@ -33,7 +33,7 @@ A problem with an app goes to that app's issue tracker, which the Support link o
 
 ## Contributing
 
-Issues and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the template checks and the icons.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Disclaimer
 

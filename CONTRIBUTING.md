@@ -1,48 +1,20 @@
 # Contributing to unraid-templates
 
-This page is for anyone who wants to change a template or an icon. The general guidelines for cplieger repositories are in [cplieger/.github](https://github.com/cplieger/.github/blob/main/CONTRIBUTING.md).
+The [shared rules](https://github.com/cplieger/.github/blob/main/CONTRIBUTING.md) for commits, releases, synced files and checks apply here.
 
-## What is here
+## Rules
 
-- `templates/<app>.xml` holds one template per app, in the `<Container version="2">` format Unraid's Docker manager reads.
-- `ca_profile.xml` describes this repository to Community Applications, which shows it as the repository's description.
-- `icon.png` is the repository icon, and `icons/<app>.png` is the icon each template points at.
-- `scripts/validate.py` checks the templates and the profile.
-- `scripts/icons.py` renders the icons.
-- `scripts/release.sh` creates a release when the merged commit subjects call for a version bump.
+- A new app touches four places: `templates/<app>.xml`, its icon, its name in the `<Profile>` text of `ca_profile.xml`, and the apps table and app count in `README.md`. `scripts/validate.py` reports a missing icon or profile mention, but never the README.
+- `scripts/icons.py` generates `icon.png` and everything under `icons/` from the glyphs it holds as SVG paths. Change the script and run `uv run --with cairosvg scripts/icons.py`. Never edit an output by hand, because the next run overwrites it.
+- The exception is `icons/brand/*.svg`, each a copy of an app's own favicon that the script only rasterises and reshapes. Update one by copying that favicon again.
+- A template whose app writes to a mapped folder sets `--user 99:100`, Unraid's own user and group, in `<ExtraParams>`. The images take their user only from `--user` and read no `PUID` or `PGID` variable, so adding either one changes nothing.
 
 ## Checks
 
-`scripts/validate.py` runs on every pull request. Run it locally with `python3 scripts/validate.py`. It prints one line per finding and exits 1 when it finds any.
+Run `python3 scripts/validate.py` before you push. It needs only Python 3. CI runs it only in the Publish workflow, so the local check in the shared rules does not cover it.
 
-It checks that each template:
+## Releases
 
-- is well-formed XML with a `<Container version="2">` root
-- has every required element, including `Support`, `Project`, `Overview` and `Icon`
-- uses a `<Name>` no other template uses
-- names a tagged `cplieger/*` image in `<Repository>`
-- has a `<TemplateURL>` that names its own file on `main`
-- points `<Icon>` at a file that exists in `icons/`
-- has no `<Shell>`, because the images are distroless and have no shell
-- uses only allowed `Type`, `Display`, `Mode`, `Required` and `Mask` values on each `Config`, with no duplicate target
-- gives each optional `Config` the same `Default` as its value.
+Community Applications builds its feed from the templates on `main`, so a merged change reaches the Apps tab at the next build, whatever its commit type. The GitHub release is only the changelog.
 
-It also checks that `ca_profile.xml` mentions every app and points at an icon in this repository. Any other XML file outside `templates/` fails the check, because Community Applications reads every XML file in the repository as a template.
-
-## Icons
-
-Every generated icon follows one design. It is a square tile in a colour whose hue names the app's ecosystem, such as Plex, Sonarr and Radarr, or storage. One off-white glyph sits on the tile, in the same glyph box, stroke width and corner radius as every other icon.
-
-`scripts/icons.py` holds every glyph as SVG paths. Run `uv run --with cairosvg scripts/icons.py` to render `icons/src/*.svg` and the PNGs the templates point at. Edit the script, not the generated images.
-
-An app that ships its own mark keeps it. Its SVG is copied from the app's favicon into `icons/brand/`, and the script only rasterises and reshapes it, so those files are edited as art.
-
-The same run writes the other shape and polarity combinations to `icons/variants/`. No template points at them, and Unraid never downloads them.
-
-## Commits and pull requests
-
-Write commit subjects as conventional commits, such as `fix: correct the seadex-scout config path`. When the merged subjects call for a version bump, `scripts/release.sh` cuts a GitHub release from the subjects since the last tag. Community Applications reads `main` directly, so the release is the changelog and carries no files. A merged change reaches the Apps tab at the next Community Applications feed build.
-
-## Conduct and security
-
-Follow the [code of conduct](https://github.com/cplieger/.github/blob/main/CODE_OF_CONDUCT.md). Report a security problem as the [security policy](https://github.com/cplieger/.github/blob/main/SECURITY.md) describes, not in a public issue.
+Unlike the shared table, `scripts/release.sh` cuts no release for a type the table does not name, and cuts a major version for a `!` after any type or a `BREAKING CHANGE:` footer on any commit.
