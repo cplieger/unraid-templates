@@ -17,4 +17,4 @@ Run `python3 scripts/validate.py` before you push. It needs only Python 3. CI ru
 
 Community Applications builds its feed from the templates on `main`, so a merged change reaches the Apps tab at the next build, whatever its commit type. The GitHub release is only the changelog.
 
-Unlike the shared table, `scripts/release.sh` cuts no release for a type the table does not name, and cuts a major version for a `!` after any type or a `BREAKING CHANGE:` footer on any commit.
+`scripts/release.sh` cuts a release only when a file Community Apps reads has changed: a template, `ca_profile.xml`, `icon.png` or a PNG in `icons/`. A change to CI, scripts, docs or icon sources cuts no release, whatever its type. The commits that touch those files set the version. A `!` after any type or a `BREAKING CHANGE:` footer is a major release, a `feat` is a minor release, and anything else is a patch.

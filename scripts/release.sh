@@ -1,31 +1,35 @@
 #!/usr/bin/env bash
-# Cut a semver release from conventional-commit subjects since the last tag.
-# Runs after validate in publish.yaml; DRY_RUN=1 prints the decision and
+# Cut a semver release when a file Community Apps reads changed since the last
+# tag. Runs after validate in publish.yaml; DRY_RUN=1 prints the decision and
 # creates nothing. Community Apps reads main directly, so a release carries no
 # assets: it is the changelog of the template set.
 set -euo pipefail
 
 REPO="${GITHUB_REPOSITORY:-cplieger/unraid-templates}"
+# What CA and an install read: the templates, the profile and the icon PNGs
+# their URLs name. A CI, script, doc or icon-source change ships nothing.
+SHIPPED=(templates ca_profile.xml icon.png ':(glob)icons/*.png')
 
 last="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
 range="${last:+${last}..HEAD}"
 range="${range:-HEAD}"
 
-subjects="$(git log --format='%s' "$range" -- . ':!*.md' ':!.editorconfig' ':!.gitattributes' ':!.gitignore' ':!renovate.json')"
-bodies="$(git log --format='%b' "$range")"
+subjects="$(git log --format='%s' "$range" -- "${SHIPPED[@]}")"
+bodies="$(git log --format='%b' "$range" -- "${SHIPPED[@]}")"
 
-bump=""
+# The tree compare catches a change reverted inside the range, which still
+# leaves subjects behind.
+if [ -z "$subjects" ] || { [ -n "$last" ] && git diff --quiet "$last" HEAD -- "${SHIPPED[@]}"; }; then
+  echo "release: no shipped file changed since ${last:-the beginning}; nothing to cut"
+  exit 0
+fi
+
+# A shipped change always releases, so patch is the floor and commits only raise it.
+bump="patch"
 if grep -qE '^[a-z]+(\([^)]*\))?!:' <<<"$subjects" || grep -q '^BREAKING CHANGE:' <<<"$bodies"; then
   bump="major"
 elif grep -qE '^feat(\([^)]*\))?:' <<<"$subjects"; then
   bump="minor"
-elif grep -qE '^(fix|perf|sec|refactor|chore\(deps\))(\([^)]*\))?:' <<<"$subjects"; then
-  bump="patch"
-fi
-
-if [ -z "$bump" ]; then
-  echo "release: no releasing commit since ${last:-the beginning}; nothing to cut"
-  exit 0
 fi
 
 if [ -z "$last" ]; then

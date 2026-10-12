@@ -1,5 +1,6 @@
 # Template publish: check every template and the repository profile, then cut
-# a semver release from conventional-commit subjects since the last tag. This
+# a semver release when a file Community Apps reads changed since the last tag
+# (scripts/release.sh). This
 # repo has no go.mod, jsr.json or Dockerfile, so the central release pipeline
 # never runs for it; the release is owned here, the way tool-catalog's is.
 # Community Apps reads main directly, so the release carries no assets and
