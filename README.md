@@ -27,7 +27,7 @@ Each field's description says where to find a token or key, and each template's 
 
 Every template installs the image's `latest` tag, so the Docker tab offers each new release as an update. Your installed container keeps the settings you chose. When a template gains a new field later, only new installs show it.
 
-The update includes new major versions. Before you update across one, read the app's release notes, which say what to change, such as a renamed health path or an alert rule file to replace. To stay on one major version, edit the container's Repository to `cplieger/<app>:v<major>`.
+Those updates include new major versions. Before you update across one, read the app's release notes, which say what to change, such as a renamed health path or an alert rule file to replace. To stay on one major version, change the tag at the end of the container's Repository from `latest` to `v<major>`, for example `cplieger/plex-exporter:v4`.
 
 ## Support
 
