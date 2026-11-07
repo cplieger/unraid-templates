@@ -10,7 +10,7 @@
   <ReadMe>https://raw.githubusercontent.com/cplieger/docker-fclones-scheduler/main/README.md</ReadMe>
   <Overview>Runs the fclones duplicate finder on a schedule and gets back the disk space that duplicate files take.
 
-Scans your share every 3 hours by default, or when your own scheduler asks. Replaces each extra copy with a hardlink or a copy-on-write clone, deletes it, or only reports it, and logs each duplicate it found and the space it freed. The default action only reports, so switch to link, remove or dedupe once a report has shown you what it would touch. No web UI, no open port.</Overview>
+Scans your share every 3 hours by default, or when your own scheduler asks. Replaces each extra copy with a hardlink or a copy-on-write clone, deletes it, or only reports it, and logs each duplicate it found and the space it freed. The default action only reports, so switch to link, remove or dedupe once a report has shown you what it would touch. No web UI, and no open port unless you turn on metrics.</Overview>
   <Category>Tools:Utilities</Category>
   <Icon>https://raw.githubusercontent.com/cplieger/unraid-templates/main/icons/fclones-scheduler.png</Icon>
   <TemplateURL>https://raw.githubusercontent.com/cplieger/unraid-templates/main/templates/fclones-scheduler.xml</TemplateURL>
@@ -29,5 +29,6 @@ The container reports unhealthy until its first scan completes, and on a large s
   <Config Name="Action arguments" Target="FCLONES_ACTION_ARGS" Default="" Mode="" Description="Extra flags for the action phase, such as --priority bottom. --dry-run previews the action without changing files" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
   <Config Name="Scan timeout" Target="SCAN_TIMEOUT" Default="12h" Mode="" Description="Timeout for each phase as a Go duration. Raise it when a first scan of a large share exceeds 12h. 0 turns it off" Type="Variable" Display="advanced" Required="false" Mask="false">12h</Config>
   <Config Name="Log level" Target="LOG_LEVEL" Default="info" Mode="" Description="Minimum log level: debug, info, warn or error" Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+  <Config Name="Metrics address" Target="METRICS_LISTEN_ADDR" Default="" Mode="" Description="Leave empty to open no port. Set to :9469 to serve Prometheus metrics at /metrics and a health check at /healthz, both with no login, then add a Port mapping for 9469 so your scraper or uptime prober can reach it at the server's IP" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
   <Config Name="Allow unsafe arguments" Target="ALLOW_UNSAFE_ARGS" Default="false" Mode="" Description="Set to true to allow the --transform, --in-place and --no-copy fclones flags, which are refused by default" Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
 </Container>

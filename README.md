@@ -23,7 +23,7 @@ Without these templates, you would copy each image's settings from its README in
 2. Search for the app by name and click Install.
 3. Fill in the fields marked required in the Add Container form, then click Apply.
 
-Each field's description says where to find a token or key, and each template's notes say what else the app needs. An app that keeps files stores them under `/mnt/user/appdata/<app>`, and its template lets it write there from the first start. Every template runs its app on the bridge network, without privileged mode. fclones-scheduler mounts the share you choose with write access, because linking and removing files need it.
+Each field's description says where to find a token or key, and each template's notes say what else the app needs. An app that keeps files stores them under `/mnt/user/appdata/<app>`, and its template lets it write there from the first start. Every template runs its app on the bridge network, without privileged mode. fclones-scheduler mounts the share you choose with write access, because linking and removing files need it. To scrape an app's metrics, set its Metrics address and add a Port mapping for that port. The default bridge network has no container names, so your scraper uses the server's IP.
 
 Every template installs the image's `latest` tag, so the Docker tab offers each new release as an update. Your installed container keeps the settings you chose. When a template gains a new field later, only new installs show it.
 
