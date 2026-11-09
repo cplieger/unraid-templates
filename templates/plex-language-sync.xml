@@ -10,7 +10,7 @@
   <ReadMe>https://raw.githubusercontent.com/cplieger/plex-language-sync/main/README.md</ReadMe>
   <Overview>Remembers the audio and subtitle languages you pick for each TV show in Plex and sets them on every other episode, for each user of your server.
 
-Sets your choice on the rest of the show as soon as you pick it on one episode, and gives new episodes the same tracks when Plex adds them. It learns which subtitles you pair with each audio language and sets them on new shows. It chooses between the tracks your files already have and downloads nothing. No web UI, no open port.</Overview>
+Sets your choice on the rest of the show as soon as you pick it on one episode, and gives new episodes the same tracks when Plex adds them. It learns which subtitles you pair with each audio language and sets them on new shows. It chooses between the tracks your files already have and downloads nothing. No web UI, and no open port unless you turn on metrics.</Overview>
   <Category>MediaApp:Video Tools:Utilities</Category>
   <Icon>https://raw.githubusercontent.com/cplieger/unraid-templates/main/icons/plex-language-sync.png</Icon>
   <TemplateURL>https://raw.githubusercontent.com/cplieger/unraid-templates/main/templates/plex-language-sync.xml</TemplateURL>
@@ -34,5 +34,6 @@ Raise the Docker stop time-out to 20 seconds or more (Settings, Docker, advanced
   <Config Name="Ignore labels" Target="IGNORE_LABELS" Default="PAL_IGNORE,PLS_IGNORE" Mode="" Description="Comma-separated Plex labels that exclude a show from language sync. Matching is exact and case-sensitive, and setting this replaces the defaults" Type="Variable" Display="advanced" Required="false" Mask="false">PAL_IGNORE,PLS_IGNORE</Config>
   <Config Name="Ignore libraries" Target="IGNORE_LIBRARIES" Default="" Mode="" Description="Comma-separated Plex library names to exclude entirely. Matching is exact and case-sensitive" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
   <Config Name="Log level" Target="LOG_LEVEL" Default="info" Mode="" Description="Minimum log level: debug, info, warn or error. debug shows why each event was skipped and how streams were matched" Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+  <Config Name="Metrics address" Target="METRICS_LISTEN_ADDR" Default="" Mode="" Description="Leave empty to open no port. Set to :9471 to serve Prometheus metrics at /metrics and a health check at /healthz, both with no login, then add a Port mapping for 9471 so your scraper or uptime prober can reach it at the server's IP" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
   <Config Name="Plex CA certificate path" Target="PLEX_CA_CERT_PATH" Default="" Mode="" Description="Only for an https Plex URL with a self-signed or private-CA certificate. The path of the CA PEM file inside the container, with a matching path mapping" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
 </Container>
