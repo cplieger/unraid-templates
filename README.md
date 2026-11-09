@@ -11,7 +11,7 @@ All four are listed in [Community Applications](https://docs.unraid.net/communit
 | App | What you get | What you fill in | Template |
 | --- | --- | --- | --- |
 | [plex-language-sync](https://github.com/cplieger/plex-language-sync) | Set the audio and subtitle language once per show, and every new episode follows | Plex URL and Plex token | [`plex-language-sync.xml`](templates/plex-language-sync.xml) |
-| [plex-exporter](https://github.com/cplieger/plex-exporter) | See your Plex server's sessions, libraries, bandwidth and transcoding in Grafana | Plex URL and Plex token. You also need Prometheus or another metrics collector, and Grafana | [`plex-exporter.xml`](templates/plex-exporter.xml) |
+| [plex-exporter](https://github.com/cplieger/plex-exporter) | See your Plex server's sessions, libraries, bandwidth and transcoding in Grafana | Plex URL and Plex token. You also need Prometheus or another metric store, Grafana for the dashboard, and Alertmanager for alerts | [`plex-exporter.xml`](templates/plex-exporter.xml) |
 | [fclones-scheduler](https://github.com/cplieger/docker-fclones-scheduler) | Find duplicate files on a share with [fclones](https://github.com/pkolaczk/fclones) on a schedule, and link or remove them if you choose | The share to scan. The default action only reports | [`fclones-scheduler.xml`](templates/fclones-scheduler.xml) |
 | [seadex-scout](https://github.com/cplieger/seadex-scout) | Keep your Sonarr and Radarr anime library in sync with SeaDex's best releases | Sonarr URL and Sonarr API key. Radarr is optional | [`seadex-scout.xml`](templates/seadex-scout.xml) |
 
